@@ -1,0 +1,27 @@
+Secure RBAC System – Implementation Guide & Documentation
+📌 Key Security Rules & Edge Cases
+Your RBAC (Role-Based Access Control) system must follow enterprise-level security to prevent privilege escalation, insider threats, and unauthorized actions. Below are the key security principles:
+
+🛡 1. Role Hierarchy & Promotion Rules
+Role	Permissions	Promotion Allowed By
+Student	Limited access, enroll in courses, take tests	Trainer, Admin, Super Admin
+Trainer	Conduct classes, upload materials, manage students	Admin, Super Admin
+Admin	Manage users, courses, batches, and trainers	Super Admin Only
+Super Admin	Full control, can promote/demote Admins	Only one per organization
+
+
+🚨 Edge Cases Prevented:
+✔ Students cannot be directly promoted to Admin/Super Admin
+✔ Super Admin cannot be deleted unless another Super Admin exists
+✔ Admins cannot promote themselves or others to Super Admin
+✔ Super Admin promotion requires multi-factor authentication (OTP/email verification)
+✔ Only existing Admins can be promoted to Super Admin
+
+🛡 2. Security Measures to Prevent Attacks
+Attack Type	Mitigation Strategy
+Privilege Escalation	Multi-step role verification, Super Admin approval
+JWT Token Theft	Session tracking, Token expiration & Revocation
+Brute Force Attacks	Rate-limiting, Captcha verification
+Role Tampering via API Calls	Fine-grained access control, ACL on APIs
+Malicious Admins Creating Fake Accounts	Domain-based Admin verification
+Super Admin Deletion Accidentally	At least one Super Admin is always required

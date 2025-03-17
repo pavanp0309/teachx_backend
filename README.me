@@ -1,0 +1,243 @@
+📌Dependencies Breakdown
+express → Server framework
+mongoose → MongoDB ORM
+dotenv → Manage environment variables
+bcryptjs → Hashing passwords
+jsonwebtoken → Authentication using JWT
+cors → Cross-Origin Resource Sharing
+multer → File uploads (For profile pictures, PDFs, etc.)
+nodemailer → Email OTP verification
+socket.io → Real-time features (Live classes, notifications)
+stripe → Payment integration
+zod → Data validation (Better than express-validator)
+moment → Date handling
+jest & supertest → Testing
+
+// command used to install the 📌Dependencies
+npm init -y
+npm install express mongoose dotenv bcryptjs jsonwebtoken cors multer nodemailer socket.io stripe zod express-validator moment
+npm install --save-dev nodemon jest supertest
+
+npm init -y
+npm install express mongoose dotenv jsonwebtoken bcryptjs cookie-parser cors nodemailer twilio google-auth-library multer
+npm install --save-dev nodemon
+
+present required
+npm install express dotenv mongoose cors jsonwebtoken bcryptjs cookie-parser express-validator nodemailer
+
+present using
+npm install express mongoose dotenv bcryptjs jsonwebtoken nodemailer cors morgan express-rate-limit helmet
+npm install express mongoose dotenv cors nodemailer jsonwebtoken bcryptjs express-rate-limit
+
+
+express	         Backend framework
+dotenv	         Manage environment variables
+mongoose	     MongoDB object modeling
+cors	         Enable cross-origin requests
+jsonwebtoken	    Handle authentication using JWT
+bcryptjs	        Hash passwords securely
+cookie-parser	    Parse cookies for authentication
+express-validator	Validate incoming requests
+nodemailer	        Send OTP emails
+nodemon	            Auto-restart server on changes
+
+
+
+Registration Flow
+
+👥👤If the user is new → Generate OTP and Register
+✅ Send OTP
+✅ Verify OTP
+✅ Create a new user
+
+👥👤If the user exists → Show error & guide them to login
+❌ Do not generate a new OTP for registration.
+✅ Ask them to log in instead.
+✅ If they forgot their password, send OTP for password reset.
+
+
+New user (not registered)➡➡➡➡➡➡➡➡	Send OTP → Verify OTP → Register User
+User already registered➡➡➡➡➡➡➡➡➡➡	Show error → Ask them to log in
+User forgot password➡➡➡➡➡➡➡➡➡➡➡➡	Send OTP → Verify OTP → Allow password reset
+User wants to log in with OTP➡➡➡➡➡➡➡➡➡	Generate OTP → Verify OTP → Log in
+
+📌 New User (Not Registered) 
+   ⬇ Send OTP → Verify OTP → Register User
+
+📌 User Already Registered
+   ⬇ Show error → Ask them to log in
+
+📌 Forgot Password
+   ⬇ Send OTP → Verify OTP → Allow password reset
+
+📌 Login with Password
+   ⬇ Verify credentials → Generate JWT → Login success
+
+📌 Login with OTP (Passwordless)
+   ⬇ Generate OTP → Verify OTP → Generate JWT → Login success
+
+
+
+ JWT_SECRET (JSON Web Token Secret)
+ node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+
+
+creating the cluster
+https://www.mongodb.com/products/platform/atlas-database;
+
+Username:pavan
+password:ClSqv2zNHxuBoXpZ
+Username:pavanreddy
+password:pavan0309
+
+
+mongodb+srv://<db_username>:<db_password>@teachx.4qhnn.mongodb.net/?retryWrites=true&w=majority&appName=teachx
+mongodb+srv://pavanreddy:pavan0309>@teachx.4qhnn.mongodb.net/?retryWrites=true&w=majority&appName=teachx
+
+Sign Up for MongoDB Atlas:
+Step 2: Create a New Cluster
+Step 3:Configure Database Access
+Go to "Database Access" from the left panel.
+Click "Add New Database User".
+Set a username and password (Save this! You'll need it later).
+Select "Password" as the authentication method.
+Click "Add User".
+Step 4: Allow IP Access (Network Configuration)
+Go to "Network Access" from the left panel.
+Click "Add IP Address".
+Choose "Allow Access from Anywhere" (for development) or add your IP.
+Click Confirm.
+
+MongoDB Connection String in the Latest UI
+Step 1: Click on "Drivers"
+Since you're using Node.js, you need the MongoDB native driver.
+
+Click on "Drivers" (first option).
+
+Select Node.js as your driver.
+
+Choose the version "5.0 or later" (recommended).
+
+You will now see a MongoDB connection URI similar to this:
+
+🎉🧨npm install express mongoose dotenv cors jsonwebtoken bcryptjs cookie-parser nodemailer google-auth-library
+
+Email_OTP _TESTING
+Step 1: Generate OTP (Send OTP to Email)
+Method: POST
+URL: http://localhost:5000/api/auth/send-otp
+Headers:Content-Type: application/json
+Body (JSON):{"email": "your-admin-email@example.com"}
+Response (Expected):{"message": "OTP sent to email"}
+
+
+Step 2: Verify OTP (Login)
+
+Request:
+Method: POST
+URL: http://localhost:5000/api/auth/verify-otp
+Headers:Content-Type: application/json
+Body (JSON):
+{
+  "email": "your-admin-email@example.com",
+  "otp": "123456"  // Replace with the actual OTP
+}
+Response (Expected)
+
+{
+  "message": "Login successful",
+  "token": "YOUR_GENERATED_TOKEN",
+  "user": {
+    "_id": "67cf1e76dfd86a1b43ad4d9c",
+    "email": "your-admin-email@example.com",
+    "role": "admin",
+    "isVerified": true
+  }
+}
+
+
+
+Step3:update-profile
+Method: POST
+URL: http://localhost:5000/api/auth/update-profile
+Headers:
+Authorization: Bearer YOUR_JWT_TOKEN ✅ (Important)
+Content-Type: application/json
+Body (Raw - JSON):
+
+{
+  "name": "John Doe",
+  "phone": "1234567890"
+}
+
+
+
+🔐🔏⚒🔐Test RBAC Features-admin🔐🔏⚒🔐
+POST: http://localhost:5000/api/auth/login
+
+ Get All Users (Admin Only)
+ Method: Get
+ URL:http://localhost:5000/api/admin/all-users 
+ Headers:
+{
+  "Authorization": "Bearer YOUR_ADMIN_TOKEN"
+}
+
+Method: PUT
+URL: http://localhost:5000/api/admin/promote-user/67cfc06b7e3341062396dd17
+Headers:
+Authorization: Bearer <your_admin_token>
+Content-Type: application/json
+
+{
+  "message": "User promoted to trainer",
+  "user": {
+    "_id": "67cfc06b7e3341062396dd17",
+    "email": "allamviswas8@gmail.com",
+    "role": "trainer",
+    "isVerified": true,
+    "name": "viswas",
+    "phone": "7995524942"
+  }
+}
+
+
+ 1. Batch Creation (Admin Only)
+
+  Flow
+1️⃣ Admin sends a POST request to /api/batches/create.
+2️⃣ A unique batch code is generated.
+3️⃣ The batch is saved in the database.
+4️⃣ A success response is sent.
+
+
+
+
+Schema Design
+name	Stores the batch name (e.g., "React Advanced Course").
+code	Unique immutable batch code used for student registration.
+admin	Admin (role-based access control) who created the batch.
+trainers	Array of assigned trainers (references User model).
+students	Array of students who joined (with approval status).
+startDate / endDate	Defines the batch duration (required start date).
+schedule	Optional batch schedule (e.g., "Mon, Wed, Fri - 6 PM to 8 PM").
+liveClasses	References LiveClass model (live classes for the batch).
+assignments	References Assignment model (batch-specific assignments).
+tests	References Test model (batch-specific tests).
+attendance	References Attendance model (tracks student presence).
+notifications	References Notification model (batch-wide updates).
+status	Batch lifecycle state (Active, Completed, Archived).
+createdAt / updatedAt	Auto-generated timestamps for batch creation/modification
+
+
+
+Features Covered in This Batch Controller
+✅ Create a Batch (Admin Only)
+✅ Assign Trainers to a Batch (Admin Only)
+✅ Students Request to Join a Batch (Self-Join)
+✅ Approve Student to Join (Admin/Trainer Only)
+✅ Remove Student from a Batch (Admin/Trainer Only)
+✅ Fetch All Batches (With Filters & Pagination)
+✅ Fetch Single Batch Details (With Trainer & Student Details)
+✅ Update Batch Details (Admin Only)
+✅ Delete a Batch (Admin Only)
