@@ -95,7 +95,13 @@ const BatchSchema = new mongoose.Schema(
         ref: "Notification",
       },
     ],
-
+    enrollmentRequests: [
+      {
+        student: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
+        requestedAt: { type: Date, default: Date.now },
+      },
+    ],
     status: {
       type: String,
       enum: ["Active", "Completed", "Archived"],
@@ -131,8 +137,6 @@ BatchSchema.pre("save", function (next) {
 
 // ✅ Indexing for Faster Queries
 BatchSchema.index({ startDate: 1, status: 1 });
-BatchSchema.index({ admin: 1 });
-BatchSchema.index({ trainers: 1 });
 BatchSchema.index({ students: 1 });
 
 // ✅ Soft Delete Support

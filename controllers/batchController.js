@@ -6,7 +6,9 @@ import User from "../models/User.js";
  * =============================== */
 export const createBatch = async (req, res) => {
   try {
-    const { name, code, admin, startDate, endDate, schedule } = req.body;
+    const { name, code, startDate, endDate, schedule } = req.body;
+    // Ensure the request contains a logged-in user (from JWT authentication)
+    const admin = req.user.id; // Extract user ID from req.user
 
     // Check if batch code is unique
     const existingBatch = await Batch.findOne({ code });
@@ -142,6 +144,8 @@ export const assignTrainer = async (req, res) => {
   }
 };
 
+
+
 /** ==============================
  * ✅ Remove Student from Batch
  * =============================== */
@@ -179,5 +183,59 @@ export const deleteBatch = async (req, res) => {
     res.status(200).json({ message: "Batch deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting batch", error: error.message });
+  }
+};
+
+export const requestEnrollment = async (req, res) => {
+  try {
+    const { batchId } = req.params; // Get batchId from URL
+    const studentId = req.user.id; // Get student ID from authenticated user
+
+    const batch = await Batch.findById(batchId);
+    if (!batch) return res.status(404).json({ message: "Batch not found" });
+
+    // Check if student already requested
+    if (batch.enrollmentRequests.some((r) => r.student.toString() === studentId)) {
+      return res.status(400).json({ message: "Enrollment request already sent" });
+    }
+
+    // Add student request
+    batch.enrollmentRequests.push({ student: studentId });
+    await batch.save();
+
+    res.status(200).json({ message: "Enrollment request sent successfully", batch });
+  } catch (error) {
+    res.status(500).json({ message: "Error requesting enrollment", error: error.message });
+  }
+};
+
+
+export const approveOrRejectEnrollment = async (req, res) => {
+  try {
+    const { batchId, studentId, action } = req.body; // action = "approve" or "reject"
+
+    const batch = await Batch.findById(batchId);
+    if (!batch) return res.status(404).json({ message: "Batch not found" });
+
+    // Find request
+    const requestIndex = batch.enrollmentRequests.findIndex((r) => r.student.toString() === studentId);
+    if (requestIndex === -1) {
+      return res.status(404).json({ message: "Enrollment request not found" });
+    }
+
+    if (action === "approve") {
+      // Move student from requests to students array
+      batch.students.push({ student: studentId, approved: true });
+      batch.enrollmentRequests.splice(requestIndex, 1);
+    } else if (action === "reject") {
+      batch.enrollmentRequests[requestIndex].status = "rejected";
+    } else {
+      return res.status(400).json({ message: "Invalid action" });
+    }
+
+    await batch.save();
+    res.status(200).json({ message: `Student ${action}d successfully`, batch });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating enrollment request", error: error.message });
   }
 };

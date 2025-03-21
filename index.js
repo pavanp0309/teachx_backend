@@ -5,7 +5,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js"; // ✅ Import Admin Routes
 import liveClassRoutes from "./routes/liveClassRoutes.js";
-// import batchRoutes from "./routes/batchRoutes.js";
+import batchRoutes from "./routes/batchRoutes.js";
 // import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 
 dotenv.config();
@@ -23,7 +23,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes); // ✅ Register Admin Routes
 app.use("/api/live-classes", liveClassRoutes);
 
-// app.use("/api/batches", batchRoutes);
+app.use("/api/batches", batchRoutes);
 
 // 🛠 Error Handling Middleware
 // app.use(notFound);
