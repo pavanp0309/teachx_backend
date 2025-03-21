@@ -1,14 +1,14 @@
 import User from "../models/User.js";
-// import logger from "../utils/logger.js"; // ✅ Logs admin actions for audits
+// import logger from "../utils/logger.js"; //  Logs admin actions for audits
 
 const roleHierarchy = {
-  superadmin: ["student", "trainer", "admin"],  // Correct Order ✅
+  superadmin: ["student", "trainer", "admin"],  // Correct Order 
   admin: ["student", "trainer"], // Admin can promote student → trainer
   trainer: ["student"], // Trainer can promote student (if needed)
 };
 
 
-// ✅ Get All Users
+//  Get All Users
 export const getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find().select("-password");
@@ -18,7 +18,7 @@ export const getAllUsers = async (req, res, next) => {
   }
 };
 
-// ✅ Promote a User (Only Within Allowed Hierarchy)
+//  Promote a User (Only Within Allowed Hierarchy)
 export const promoteUser = async (req, res, next) => {
   try {
     const admin = req.user;  // Logged-in admin making the request
@@ -52,7 +52,7 @@ export const promoteUser = async (req, res, next) => {
   }
 };
 
-// ✅ Assign Role Securely (Super Admin Only)
+//  Assign Role Securely (Super Admin Only)
 export const assignRole = async (req, res, next) => {
   try {
     const { role } = req.body;
@@ -70,7 +70,7 @@ export const assignRole = async (req, res, next) => {
     user.role = role;
     await user.save();
 
-    // logger.info(`${req.user.email} assigned ${user.email} to ${role}`); // ✅ Log Action
+    // logger.info(`${req.user.email} assigned ${user.email} to ${role}`); //  Log Action
 
     res.status(200).json({ message: `User role updated to ${role}`, user });
   } catch (error) {
@@ -78,26 +78,26 @@ export const assignRole = async (req, res, next) => {
   }
 };
 
-// ✅ Remove User (Only Allowed Hierarchy)
+//  Remove User (Only Allowed Hierarchy)
 export const removeUser = async (req, res, next) => {
   try {
     const admin = req.user;
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // ✅ Prevent Super Admin from being deleted
+    //  Prevent Super Admin from being deleted
     if (user.role === "superadmin") {
       return res.status(403).json({ message: "Super Admin cannot be deleted." });
     }
 
-    // ✅ Ensure admin can only remove users below their hierarchy
+    //  Ensure admin can only remove users below their hierarchy
     if (!roleHierarchy[admin.role]?.includes(user.role)) {
       return res.status(403).json({ message: "You cannot remove this user." });
     }
 
     await User.findByIdAndDelete(req.params.id);
 
-    // logger.warn(`${admin.email} removed ${user.email} (Role: ${user.role})`); // ✅ Log Deletion Action
+    // logger.warn(`${admin.email} removed ${user.email} (Role: ${user.role})`); //  Log Deletion Action
 
     res.status(200).json({ message: "User removed successfully" });
   } catch (error) {

@@ -3,7 +3,7 @@ import { sendEmailNotification } from "../utils/emailService.js";
 import { getZoomAccessToken } from "../config/zoomConfig.js";
 import axios from "axios";
 
-// 📌 Handle Zoom Webhooks
+//  Handle Zoom Webhooks
 export const zoomWebhookHandler = async (req, res) => {
   try {
     const { event, payload } = req.body;
@@ -37,7 +37,7 @@ export const zoomWebhookHandler = async (req, res) => {
   }
 };
 
-// 🔹 Handle Meeting Ended (Check for 40-Min Limit)
+// Handle Meeting Ended (Check for 40-Min Limit)
 const handleMeetingEnded = async (meetingId, duration) => {
   const liveClass = await LiveClass.findOne({ meetingId });
   if (!liveClass) return;
@@ -69,7 +69,7 @@ const handleMeetingEnded = async (meetingId, duration) => {
     liveClass.meetingLink = zoomResponse.data.join_url;
     await liveClass.save();
 
-    // 🔹 Notify attendees about rejoin link
+    // Notify attendees about rejoin link
     const attendees = await User.find({ _id: { $in: liveClass.attendees.map(a => a.user) } });
     attendees.forEach(student => {
       sendEmailNotification(student.email, "Live Class Rejoin", 

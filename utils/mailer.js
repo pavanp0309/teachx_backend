@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// ✅ Setup Nodemailer Transporter
+//  Setup Nodemailer Transporter
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT), // Convert port to number
@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// ✅ Function to Send OTP
+//  Function to Send OTP
 export const sendOTP = async (email, otp) => {
   try {
     const mailOptions = {
@@ -38,7 +38,7 @@ export const sendOTP = async (email, otp) => {
 
     await transporter.sendMail(mailOptions);
 
-    console.log(`✅ OTP sent to ${email}`);
+    console.log(` OTP sent to ${email}`);
   } catch (error) {
     console.error("❌ Email sending failed:", error.message);
   }

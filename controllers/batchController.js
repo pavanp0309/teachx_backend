@@ -2,7 +2,7 @@ import Batch from "../models/Batch.js";
 import User from "../models/User.js";
 
 /** ==============================
- * ✅ Create a New Batch
+ * Create a New Batch
  * =============================== */
 export const createBatch = async (req, res) => {
   try {
@@ -33,7 +33,7 @@ export const createBatch = async (req, res) => {
 };
 
 /** ==============================
- * ✅ Get All Batches (with Pagination & Filters)
+ * Get All Batches (with Pagination & Filters)
  * =============================== */
 export const getBatches = async (req, res) => {
   try {
@@ -56,7 +56,7 @@ export const getBatches = async (req, res) => {
 };
 
 /** ==============================
- * ✅ Get Batch By ID (With Population)
+ * Get Batch By ID (With Population)
  * =============================== */
 export const getBatchById = async (req, res) => {
   try {
@@ -79,7 +79,7 @@ export const getBatchById = async (req, res) => {
 };
 
 /** ==============================
- * ✅ Update Batch Details
+ * Update Batch Details
  * =============================== */
 export const updateBatch = async (req, res) => {
   try {
@@ -98,7 +98,7 @@ export const updateBatch = async (req, res) => {
 };
 
 /** ==============================
- * ✅ Enroll Student in a Batch
+ * Enroll Student in a Batch
  * =============================== */
 export const enrollStudent = async (req, res) => {
   try {
@@ -122,7 +122,7 @@ export const enrollStudent = async (req, res) => {
 };
 
 /** ==============================
- * ✅ Assign Trainer to a Batch
+ * Assign Trainer to a Batch
  * =============================== */
 export const assignTrainer = async (req, res) => {
   try {
@@ -147,7 +147,7 @@ export const assignTrainer = async (req, res) => {
 
 
 /** ==============================
- * ✅ Remove Student from Batch
+ * Remove Student from Batch
  * =============================== */
 export const removeStudent = async (req, res) => {
   try {
@@ -168,7 +168,7 @@ export const removeStudent = async (req, res) => {
 };
 
 /** ==============================
- * ✅ Soft Delete a Batch
+ * Soft Delete a Batch
  * =============================== */
 export const deleteBatch = async (req, res) => {
   try {
