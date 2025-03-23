@@ -8,14 +8,23 @@ const BatchSchema = new mongoose.Schema(
       trim: true,
       maxlength: 100, // Limit batch name length
     },
+    subject: {
+      type: String, // or create a separate Subject schema if needed
+      required: true,
+      trim: true,
+      maxlength: 100,
+    },
 
     code: {
       type: String,
       unique: true,
       required: true,
       immutable: true,
-      uppercase: true, // Ensure consistency
+      uppercase: true,
       trim: true,
+      default:  function () {
+        return `${this.name.slice(0, 3).toUpperCase()}-${Date.now().toString().slice(-4)}`;
+      }, // Generate // Prevents `null` value
     },
 
     admin: {
@@ -52,7 +61,7 @@ const BatchSchema = new mongoose.Schema(
       index: true, // Queries based on batch start date
     },
 
-    endDate: { type: Date },
+
 
     schedule: {
       type: String,
@@ -130,6 +139,7 @@ const BatchSchema = new mongoose.Schema(
 );
 
 // ✅ Pre-save Hook to Update `updatedAt` Automatically
+// ✅ Automatically update `updatedAt` field before save
 BatchSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();
