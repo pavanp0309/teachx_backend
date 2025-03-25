@@ -1,7 +1,16 @@
 import express from "express";
-import { 
-  createBatch, getBatches, getBatchById, updateBatch, deleteBatch,
-  enrollStudent, removeStudent, assignTrainer, requestEnrollment, approveOrRejectEnrollment , joinBatchByCode
+import {
+  createBatch,
+  getBatches,
+  getBatchById,
+  updateBatch,
+  deleteBatch,
+  enrollStudent,
+  removeStudent,
+  assignTrainer,
+  requestEnrollment,
+  approveOrRejectEnrollment,
+  joinBatchByCode,
 } from "../controllers/batchController.js";
 
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
@@ -24,7 +33,7 @@ router.post("/:batchId/assign-trainer", protect, authorizeRoles("admin", "supera
 
 // ===================== Enrollment Request Routes =====================
 router.post("/:batchId/request-enrollment", protect, requestEnrollment); // Student Enrollment Request
-router.put("/:batchId/approve-or-reject", protect, authorizeRoles("admin", "superadmin"), approveOrRejectEnrollment); // Admin Approval/Rejection
-router.post("/join-by-code", protect, authorizeRoles("student"), joinBatchByCode);
+router.put("/approve-or-reject", protect, authorizeRoles("admin", "superadmin"), approveOrRejectEnrollment); // Admin Approval/Rejection
+router.post("/join-by-code", protect, authorizeRoles("student"), joinBatchByCode); // Join Batch by Code
 
 export default router;

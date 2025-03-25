@@ -1,5 +1,7 @@
 import Batch from "../models/Batch.js";
-
+import mongoose from "mongoose";
+import Assignment from "../models/Assignment.js";
+import Test from "../models/Test.js"; 
 
 /* ==============================
   Create a New Batch
@@ -57,8 +59,8 @@ import Batch from "../models/Batch.js";
 export const getBatches = async (req, res) => {
   try {
     const { status, page = 1, limit = 10 } = req.query;
-    const filters = { isDeleted: false };
-    if (status) filters.status = status; // Filter by status if provided
+    const filters = { isDeleted: false }; // Exclude soft-deleted batches
+    if (status) filters.status = status;
 
     const batches = await Batch.find(filters)
       .populate("admin", "name email")
@@ -73,30 +75,44 @@ export const getBatches = async (req, res) => {
     res.status(500).json({ message: "Error fetching batches", error: error.message });
   }
 };
-
 /** ==============================
  * Get Batch By ID (With Population)
  * =============================== */
 export const getBatchById = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { batchId } = req.params;
 
-    const batch = await Batch.findById(id)
+    console.log("Batch ID from request:", batchId); // Log the batch ID
+
+    if (!batchId) {
+      return res.status(400).json({ message: "Batch ID is required" });
+    }
+
+    // Convert batchId to ObjectId
+    const objectId = new mongoose.Types.ObjectId(batchId); // Use `new` keyword
+
+    // Fetch the batch from the database
+    const batch = await Batch.findOne({ _id: objectId, isDeleted: false })
       .populate("admin", "name email")
       .populate("trainers", "name email")
       .populate("students.student", "name email approved joinedAt")
+      .populate("enrollmentRequests.student", "name email")
       .populate("liveClasses")
-      .populate("assignments")
-      .populate("tests");
+      .populate("assignments") // Populate assignments
+      .populate("tests"); // Populate tests
 
-    if (!batch) return res.status(404).json({ message: "Batch not found" });
+    if (!batch) {
+      console.log("Batch not found with ID:", batchId); // Log the missing batch ID
+      return res.status(404).json({ message: "Batch not found" });
+    }
 
+    console.log("Batch retrieved successfully:", batch); // Log the retrieved batch
     res.status(200).json({ message: "Batch retrieved successfully", batch });
   } catch (error) {
+    console.error("Error fetching batch:", error); // Log the error
     res.status(500).json({ message: "Error fetching batch", error: error.message });
   }
 };
-
 /** ==============================
  * Update Batch Details
  * =============================== */
@@ -173,7 +189,6 @@ export const assignTrainer = async (req, res) => {
 };
 
 
-
 /** ==============================
  * Remove Student from Batch
  * =============================== */
@@ -201,9 +216,9 @@ export const removeStudent = async (req, res) => {
 export const deleteBatch = async (req, res) => {
   try {
     const { batchId } = req.params;
-    console.log("Deleting batch with ID:", batchId); // Log the batch ID
 
-    const deletedBatch = await Batch.findByIdAndDelete(batchId); // Deletes permanently from MongoDB
+    // Find and delete the batch
+    const deletedBatch = await Batch.findByIdAndDelete(batchId);
 
     if (!deletedBatch) {
       console.log("Batch not found with ID:", batchId); // Log if batch is not found
@@ -217,6 +232,7 @@ export const deleteBatch = async (req, res) => {
     res.status(500).json({ message: "Error deleting batch", error: error.message });
   }
 };
+
 export const requestEnrollment = async (req, res) => {
   try {
     const { batchId } = req.params; // Get batchId from URL
@@ -241,15 +257,18 @@ export const requestEnrollment = async (req, res) => {
 };
 
 
+
 export const approveOrRejectEnrollment = async (req, res) => {
   try {
-    const { batchId, studentId, action } = req.body; // action = "approve" or "reject"
+    const { batchId, studentId, action } = req.body;
 
     const batch = await Batch.findById(batchId);
     if (!batch) return res.status(404).json({ message: "Batch not found" });
 
     // Find request
-    const requestIndex = batch.enrollmentRequests.findIndex((r) => r.student.toString() === studentId);
+    const requestIndex = batch.enrollmentRequests.findIndex(
+      (r) => r.student.toString() === studentId
+    );
     if (requestIndex === -1) {
       return res.status(404).json({ message: "Enrollment request not found" });
     }
@@ -271,19 +290,23 @@ export const approveOrRejectEnrollment = async (req, res) => {
   }
 };
 
-
 export const joinBatchByCode = async (req, res) => {
   try {
-    const { batchCode } = req.body; // Ensure batchCode is a string
-    const studentId = req.user.id; // Authenticated student's ID
+    const { batchCode } = req.body;
+    const studentId = req.user.id;
 
     // Find batch by code
-    const batch = await Batch.findOne({ code: batchCode });
+    const batch = await Batch.findOne({ code: batchCode, isDeleted: false }); // Exclude soft-deleted batches
     if (!batch) return res.status(404).json({ message: "Batch not found" });
 
     // Check if student is already enrolled
     if (batch.students.some((s) => s.student.toString() === studentId)) {
       return res.status(400).json({ message: "You are already enrolled in this batch" });
+    }
+
+    // Check if student already has a pending request
+    if (batch.enrollmentRequests.some((r) => r.student.toString() === studentId)) {
+      return res.status(400).json({ message: "You already have a pending enrollment request" });
     }
 
     // Add enrollment request
